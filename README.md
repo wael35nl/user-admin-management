@@ -11,10 +11,10 @@ User registration => securing, verification, storing
 1- create the model  
 
 - packages:
-  - mongoose (Schema, model)
+  - mongoose ( Schema, model )
 
 - folder/file:
-  - src/model/users.js
+  - src/models/users.js
 
 ```js
 const userSchema = new Schema({
@@ -35,7 +35,7 @@ const User = model('users', userSchema);
 2- create the routes  
 
 - packages:
-  - express (Router)
+  - express ( Router )
   - formidable -for files uploads-
 
 - folder/file:
@@ -62,7 +62,8 @@ router.post('/verify-email', verifyEmail);
   - bcrypt
 
 - folder/file:
-  - src/helpers/securePassword.js
+  - create the securePassword function: src/helpers/securePassword.js
+  - call the securePassword function: src/controllers/users.js ( registerUser )
 
 ```js
 const securePassword = async (plainPassword) => {
@@ -80,7 +81,7 @@ const securePassword = async (plainPassword) => {
   - jwt
 
 - folder/file:
-  - src/controllers/users.js (registerUser)
+  - src/controllers/users.js ( registerUser )
 
 ```js
 const token = jwt.sign({ userData }, jwtSecretKey, { expiresIn: '10m' });
@@ -89,7 +90,7 @@ const token = jwt.sign({ userData }, jwtSecretKey, { expiresIn: '10m' });
 5- prepare the email data
 
 - folder/file:
-  - src/controllers/users.js (registerUser)
+  - src/controllers/users.js ( registerUser )
 
 ```js
 const emailData = {
@@ -97,7 +98,7 @@ const emailData = {
     subject: 'Account activation email',
     html: `
         <h2>Hello ${name}!</h2>
-        <p>Please click here to <a href='${dev.app.clientUrl}/api/users/activate/${token}' target='_blank'>activate your account</a></p>
+        <p>Please click here to <a href='${clientUrl}/api/users/activate/${token}' target='_blank'>activate your account</a></p>
         `
 }
 ```
@@ -108,7 +109,8 @@ const emailData = {
   - nodemailer
 
 - folder/file:
-  - src/controllers/users.js (registerUser)
+  - create the sendEmail function: src/helpers/email.js
+  - call the sendEmail function: src/controllers/users.js ( registerUser )
 
 ```js
 const sendEmailWithNodeMailer = async (emailData) => {
@@ -155,7 +157,7 @@ const sendEmailWithNodeMailer = async (emailData) => {
 
 ### Fifth step (Developer)
 
-7- verify the email, and create the user without image, then conditionally add the image
+7- verify the email, and create the user without image, then conditionally add the image.
 
 - packages:
   - jwt
