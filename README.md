@@ -1,14 +1,14 @@
 # user-admin-management
 
-User registration => securing, verifying, storing
+User registration => securing, verifying, storing..
 
 &nbsp;
 
 ## Process steps
 
-### First step (Developer)
+### First step ( Developer )
 
-1- create the model  
+1- create the model.
 
 - packages:
   - mongoose ( Schema, model )
@@ -21,18 +21,14 @@ const userSchema = new Schema({
     name: {},
     email: {},
     password: {},
-    phone: {},
-    is_admin: {},
-    is_verified: {},
-    createdAt: {},
-    image: {}
+    image: {},
     ...
 });
 
 const User = model('users', userSchema);
 ```
 
-2- create the routes  
+2- create the routes.
 
 - packages:
   - express ( Router )
@@ -48,15 +44,15 @@ router.post('/verify-email', verifyEmail);
 
 &nbsp;
 
-### Second step (User)
+### Second step ( User )
 
-1- fill in the required information in the registration from, and click register.
+1- fill in the required information in the registration from, then click on register.
 
 &nbsp;
 
-### Third step (Developer)
+### Third step ( Developer )
 
-3- secure the password  
+3- secure the password.
 
 - packages:
   - bcrypt
@@ -66,6 +62,7 @@ router.post('/verify-email', verifyEmail);
   - call the securePassword function: src/controllers/users.js ( registerUser )
 
 ```js
+const saltRounds = 10;
 const securePassword = async (plainPassword) => {
     try {
         return await bcrypt.hash(plainPassword, saltRounds);
@@ -75,7 +72,7 @@ const securePassword = async (plainPassword) => {
 }
 ```
 
-4- create the token  
+4- create the token.
 
 - packages:
   - jwt
@@ -87,7 +84,7 @@ const securePassword = async (plainPassword) => {
 const token = jwt.sign({ userData }, jwtSecretKey, { expiresIn: '10m' });
 ```
 
-5- prepare the email data
+5- prepare the email data.
 
 - folder/file:
   - src/controllers/users.js ( registerUser )
@@ -103,7 +100,7 @@ const emailData = {
 }
 ```
 
-6- send the verification email  
+6- send the verification email.
 
 - packages:
   - nodemailer
@@ -149,13 +146,13 @@ const sendEmailWithNodeMailer = async (emailData) => {
 
 &nbsp;
 
-### Fourth step (User)
+### Fourth step ( User )
 
 2- click on the verification link received in the email.
 
 &nbsp;
 
-### Fifth step (Developer)
+### Fifth step ( Developer )
 
 7- verify the email, and create the user without image, then conditionally add the image.
 
