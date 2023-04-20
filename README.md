@@ -1,6 +1,6 @@
 # user-admin-management
 
-User registration => securing, verification, storing
+User registration => securing, verifying, storing
 
 &nbsp;
 
