@@ -6,6 +6,17 @@ import { securePassword, comparePassword } from "../helpers/securePassword.js";
 import dev from '../config/index.js';
 import { sendEmailWithNodeMailer } from '../helpers/email.js';
 
+const getAllUsers = async (req, res) => {
+    try {
+        if (req.url === '/' && req.method === 'GET') {
+            const users = await User.find({}, { _id: 1, name: 1, email: 1, phone: 1 });
+            return res.status(200).json({ message: 'All users', users });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, phone } = req.fields
@@ -43,7 +54,7 @@ const registerUser = async (req, res) => {
             subject: 'Account activation email',
             html: `
             <h2>Hello ${name}!</h2>
-            <p>Please click here to <a href='${dev.app.clientUrl}/api/users/activate/${token}' target='_blank'>activate your account</a></p>
+            <p>Please click here to <a href='${dev.app.clientUrl}/api/users/activate?token=${token}' target='_blank'>activate your account</a></p>
             `
         }
 
@@ -129,7 +140,7 @@ const loginUser = async (req, res) => {
             });
         }
 
-        // create the session
+        req.session.userId = user._id;
 
         res.status(200).json({
             message: 'login successful', user: {
@@ -158,6 +169,8 @@ const userProfile = (req, res) => {
 
 const logoutUser = (req, res) => {
     try {
+        req.session.destroy();
+        res.clearCookie('user-session');
         res.status(200).json({ message: 'logout successful' });
     } catch (error) {
         res.status(500).json({
@@ -166,4 +179,4 @@ const logoutUser = (req, res) => {
     }
 }
 
-export { registerUser, verifyEmail, loginUser, logoutUser, userProfile };
+export { getAllUsers, registerUser, verifyEmail, loginUser, logoutUser, userProfile };

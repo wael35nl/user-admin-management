@@ -1,14 +1,26 @@
-import formidable from 'express-formidable';
 import { Router } from 'express';
+import formidable from 'express-formidable';
+import session from 'express-session';
 
-import { registerUser, verifyEmail, loginUser, logoutUser, userProfile } from '../controllers/users.js';
+import dev from '../config/index.js';
+import { getAllUsers, registerUser, verifyEmail, loginUser, logoutUser, userProfile } from '../controllers/users.js';
+import { isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
 
-const router = Router();
+const userRouter = Router();
 
-router.post('/register', formidable(), registerUser);
-router.post('/verify-email', verifyEmail);
-router.post('/login', loginUser);
-router.get('/profile', userProfile);
-router.get('/logout', logoutUser);
+userRouter.use(session({
+    name: 'user-session',
+    secret: dev.app.sessionSecretKey,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 10 * 6000 }
+}));
 
-export default router;
+userRouter.get('/', getAllUsers);
+userRouter.post('/register', formidable(), registerUser);
+userRouter.post('/verify-email', verifyEmail);
+userRouter.post('/login', isLoggedOut, loginUser);
+userRouter.get('/profile', isLoggedIn, userProfile);
+userRouter.get('/logout', logoutUser);
+
+export default userRouter;
