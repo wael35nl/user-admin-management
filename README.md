@@ -4,7 +4,11 @@
 
 ## User registration => securing, verifying, storing
 
+&nbsp;
+
 ### Process steps
+
+&nbsp;
 
 #### First step ( Developer )
 
