@@ -142,14 +142,7 @@ const loginUser = async (req, res) => {
 
         req.session.userId = user._id;
 
-        res.status(200).json({
-            message: 'login successful', user: {
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                image: user.image,
-            }
-        });
+        res.status(200).json({ message: 'login successful' });
     } catch (error) {
         res.status(500).json({
             message: error.message
@@ -157,9 +150,10 @@ const loginUser = async (req, res) => {
     }
 }
 
-const userProfile = (req, res) => {
+const userProfile = async (req, res) => {
     try {
-        res.status(200).json({ message: 'return user profile' });
+        const user = await User.findById(req.session.userId, { password: 0 })
+        res.status(200).json({ ok: true, user });
     } catch (error) {
         res.status(500).json({
             message: error.message
