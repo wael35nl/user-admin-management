@@ -165,7 +165,6 @@ const logoutUser = (req, res) => {
     try {
         req.session.destroy();
         res.clearCookie('user-session');
-        res.redirect('/');
         res.status(200).json({ message: 'logout successful' });
     } catch (error) {
         res.status(500).json({
@@ -174,4 +173,45 @@ const logoutUser = (req, res) => {
     }
 }
 
-export { getAllUsers, registerUser, verifyEmail, loginUser, logoutUser, userProfile };
+const updateUser = async (req, res) => {
+    try {
+        const id = req.session.userId;
+        const { name, phone, password } = req.fields
+        const { image } = req.files;
+
+        const hashedPassword = await securePassword(password);
+
+        const user = await User.findByIdAndUpdate(id, { name, phone, password: hashedPassword }, { new: true });
+
+        if (!user) {
+            return res.status(400).json({ message: `Cannot update user` });
+        }
+
+        if (image) {
+            user.image.data = fs.readFileSync(image.path);
+            user.image.contentType = image.type;
+        }
+
+        await user.save();
+
+        res.status(200).json({ message: 'User is updated', user });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+const deleteUser = async (req, res) => {
+    try {
+        const id = req.session.userId;
+        await User.findByIdAndDelete(id);
+        res.status(200).json({ message: 'User is deleted' });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+export { getAllUsers, registerUser, verifyEmail, loginUser, userProfile, logoutUser, updateUser, deleteUser };
