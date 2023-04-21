@@ -268,4 +268,5 @@ const comparePassword = async (plainPassword, hashedPassword) => {
     ```js
     req.session.destroy();
     res.clearCookie('user-session');
+    res.redirect('/');
     ```
