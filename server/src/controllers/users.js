@@ -171,6 +171,7 @@ const logoutUser = (req, res) => {
     try {
         req.session.destroy();
         res.clearCookie('user-session');
+        res.redirect('/');
         res.status(200).json({ message: 'logout successful' });
     } catch (error) {
         res.status(500).json({
