@@ -29,7 +29,7 @@ const registerUser = async (req, res) => {
         }
         if (password.length < 6) {
             return res.status(400).json({
-                message: 'Minimum length for the password is 6'
+                message: 'Minimum length for the password is 6 characters'
             });
         }
         if (image && image.size > 1000000) {
@@ -150,6 +150,80 @@ const loginUser = async (req, res) => {
     }
 }
 
+const forgetPassword = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(404).json({
+                message: 'Something is messing'
+            });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({
+                message: 'Minimum length for the password is 6 characters'
+            });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            res.status(400).json({ message: 'user wasn\'t found with this email address' })
+        }
+
+        const hashedPassword = await securePassword(password);
+
+        const token = jwt.sign({ email, hashedPassword }, dev.app.jwtSecretKey, { expiresIn: '10m' });
+
+        const emailData = {
+            email,
+            subject: 'Resetting password email',
+            html: `
+            <h2>Hello ${user.name}!</h2>
+            <p>Please click here to <a href='${dev.app.clientUrl}/api/users/reset-password?token=${token}' target='_blank'>reset password</a></p>
+            `
+        }
+
+        sendEmailWithNodeMailer(emailData);
+
+        res.status(200).json({ message: 'an email has been sent for resetting password', token })
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(404).json({ message: 'token is messing' });
+        }
+
+        jwt.verify(token, dev.app.jwtSecretKey, async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ message: 'token is expired' });
+            }
+            const { email, hashedPassword } = decoded;
+            const isExist = await User.findOne({ email });
+            if (!isExist) {
+                return res.status(400).json({
+                    message: 'Couldn\'t find the user'
+                });
+            }
+
+            const updatedData = await User.updateOne({ email }, { $set: { password: hashedPassword } });
+
+            if (!updatedData) {
+                res.status(400).json({ message: 'password wasn\'t rested' });
+            }
+
+            res.status(200).json({ message: 'password rested successfully' });
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
 const userProfile = async (req, res) => {
     try {
         const user = await User.findById(req.session.userId, { password: 0 })
@@ -214,4 +288,4 @@ const deleteUser = async (req, res) => {
     }
 }
 
-export { getAllUsers, registerUser, verifyEmail, loginUser, userProfile, logoutUser, updateUser, deleteUser };
+export { getAllUsers, registerUser, verifyEmail, loginUser, forgetPassword, resetPassword, userProfile, logoutUser, updateUser, deleteUser };
