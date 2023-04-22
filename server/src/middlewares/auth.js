@@ -1,5 +1,5 @@
 const isLoggedIn = (message = 'Please log in') => {
-    const isLoggedIn = (req, res, next) => {
+    const loggedIn = (req, res, next) => {
         try {
             if (req.session.userId) {
                 next();
@@ -10,7 +10,7 @@ const isLoggedIn = (message = 'Please log in') => {
             console.log(error);
         }
     }
-    return isLoggedIn;
+    return loggedIn;
 }
 
 const isLoggedOut = (req, res, next) => {
