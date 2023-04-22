@@ -1,31 +1,22 @@
-const isLoggedIn = (req, res, next) => {
-    try {
-        if (req.session.userId) {
-            next();
-        } else {
-            return res.status(400).json({ message: 'Please log in' });
+const isLoggedIn = (message) => {
+    const isLoggedIn = (req, res, next) => {
+        try {
+            if (req.session.userId) {
+                next();
+            } else {
+                return res.status(400).json({ message });
+            }
+        } catch (error) {
+            console.log(error);
         }
-    } catch (error) {
-        console.log(error);
     }
-}
-
-const loggedIn = (req, res, next) => {
-    try {
-        if (req.session.userId) {
-            next();
-        } else {
-            return res.status(400).json({ message: 'You\'re already logged out' });
-        }
-    } catch (error) {
-        console.log(error);
-    }
+    return isLoggedIn;
 }
 
 const isLoggedOut = (req, res, next) => {
     try {
         if (req.session.userId) {
-            return res.status(400).json({ message: 'already logged in' });
+            return res.status(400).json({ message: 'You\'re already logged in' });
         }
         next();
     } catch (error) {
@@ -33,4 +24,4 @@ const isLoggedOut = (req, res, next) => {
     }
 }
 
-export { isLoggedIn, loggedIn, isLoggedOut };
+export { isLoggedIn, isLoggedOut };
