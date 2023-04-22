@@ -1,4 +1,4 @@
-const isLoggedIn = (message) => {
+const isLoggedIn = (message = 'Please log in') => {
     const isLoggedIn = (req, res, next) => {
         try {
             if (req.session.userId) {

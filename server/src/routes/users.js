@@ -20,9 +20,9 @@ userRouter.get('/', getAllUsers);
 userRouter.post('/register', formidable(), registerUser);
 userRouter.post('/verify-email', verifyEmail);
 userRouter.post('/login', isLoggedOut, loginUser);
-userRouter.get('/profile', isLoggedIn('Please log in'), userProfile);
+userRouter.get('/profile', isLoggedIn(), userProfile);
 userRouter.get('/logout', isLoggedIn('You\'re already logged out'), logoutUser);
-userRouter.put('/profile', isLoggedIn('Please log in'), formidable(), updateUser);
-userRouter.delete('/profile', isLoggedIn('Please log in'), deleteUser);
+userRouter.put('/profile', isLoggedIn(), formidable(), updateUser);
+userRouter.delete('/profile', isLoggedIn(), deleteUser);
 
 export default userRouter;
