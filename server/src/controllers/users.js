@@ -45,10 +45,11 @@ const verifyEmail = (req, res) => {
         jwt.verify(token, dev.app.jwtSecretKey, async (err, decoded) => {
             if (err) return errorResponse(res, 401, 'Token is expired');
 
+            const { name, email, hashedPassword, phone, image } = decoded;
+
             const isExist = await User.findOne({ email });
             if (isExist) return errorResponse(res, 400, 'This user already exists');
 
-            const { name, email, hashedPassword, phone, image } = decoded;
             const newUser = new User({
                 name,
                 email,
@@ -80,6 +81,7 @@ const loginUser = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) return errorResponse(res, 400, 'This user doesn\'t exist. Please register/signup first');
+        if (user.isBanned) return errorResponse(res, 401, 'this user is banned');
 
         const isPasswordMatched = await comparePassword(password, user.password);
         if (!isPasswordMatched) return errorResponse(res, 400, 'email/password doesn\'t match');
@@ -129,10 +131,11 @@ const resetPassword = async (req, res) => {
         jwt.verify(token, dev.app.jwtSecretKey, async (err, decoded) => {
             if (err) return errorResponse(res, 401, 'token is expired');
 
+            const { email, hashedPassword } = decoded;
+
             const isExist = await User.findOne({ email });
             if (!isExist) return errorResponse(res, 404, 'Couldn\'t find the user');
 
-            const { email, hashedPassword } = decoded;
             const updatedData = await User.updateOne({ email }, { $set: { password: hashedPassword } });
 
             if (!updatedData) return errorResponse(res, 400, 'password wasn\'t rested');

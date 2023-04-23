@@ -26,7 +26,10 @@ const loginAdmin = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const allUsers = await User.find({ is_admin: 0 });
+        if (!allUsers.length) return errorResponse(res, 404, 'No users found');
+
         successResponse(res, 200, 'All users', { users: allUsers });
+
     } catch (error) {
         return errorResponse(res, 500, error.message);
     }

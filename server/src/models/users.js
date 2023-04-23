@@ -41,6 +41,10 @@ const userSchema = new Schema({
     image: {
         data: Buffer,
         contentType: String
+    },
+    isBanned: {
+        type: Number,
+        default: 0
     }
 });
 
