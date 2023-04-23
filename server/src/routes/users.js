@@ -3,7 +3,7 @@ import formidable from 'express-formidable';
 import session from 'express-session';
 
 import dev from '../config/index.js';
-import { registerUser, verifyEmail, loginUser, forgetPassword, resetPassword, userProfile, logoutUser, updateUser, deleteUser } from '../controllers/users.js';
+import { registerUser, verifyEmail, loginUser, forgetPassword, resetPassword, userProfile, updateUser, deleteUser, logoutUser } from '../controllers/users.js';
 import { isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
 
 const userRouter = Router();

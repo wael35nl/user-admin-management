@@ -78,8 +78,7 @@ const verifyEmail = (req, res) => {
                 name,
                 email,
                 password: hashedPassword,
-                phone,
-                is_verified: 1
+                phone
             });
 
             if (image) {
@@ -224,18 +223,6 @@ const userProfile = async (req, res) => {
     }
 }
 
-const logoutUser = (req, res) => {
-    try {
-        req.session.destroy();
-        res.clearCookie('user-session');
-        res.status(200).json({ message: 'logout successful' });
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-    }
-}
-
 const updateUser = async (req, res) => {
     try {
         const id = req.session.userId;
@@ -277,4 +264,16 @@ const deleteUser = async (req, res) => {
     }
 }
 
-export { registerUser, verifyEmail, loginUser, forgetPassword, resetPassword, userProfile, logoutUser, updateUser, deleteUser };
+const logoutUser = (req, res) => {
+    try {
+        req.session.destroy();
+        res.clearCookie('user-session');
+        res.status(200).json({ message: 'logout successful' });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+    }
+}
+
+export { registerUser, verifyEmail, loginUser, forgetPassword, resetPassword, userProfile, updateUser, deleteUser, logoutUser };

@@ -34,10 +34,6 @@ const userSchema = new Schema({
         type: Number,
         default: 0
     },
-    is_verified: {
-        type: Number,
-        default: 0
-    },
     createdAt: {
         type: Date,
         default: Date.now
