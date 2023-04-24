@@ -162,14 +162,14 @@ const updateUser = async (req, res) => {
         const id = req.session.userId;
         const { name, phone, password } = req.body
         const image = req.file ? req.file.filename : '';
-        const hashedPassword = await securePassword(password);
 
-        const user = await User.findByIdAndUpdate(id, { name, phone, password: hashedPassword }, { new: true });
+        const user = await User.findByIdAndUpdate(id, { name, phone }, { new: true });
         if (!user) return errorResponse(res, 400, 'User wasn\'t updated');
 
-        if (image) {
-            user.image = `../public/images/${image}`;
-        }
+        if (image) user.image = `../public/images/${image}`;
+
+        if (password) user.password = await securePassword(password);
+
         await user.save();
 
         successResponse(res, 200, 'User is updated', { user });
