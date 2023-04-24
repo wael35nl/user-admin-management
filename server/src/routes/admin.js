@@ -3,7 +3,7 @@ import session from 'express-session';
 
 import dev from '../config/index.js';
 import { isLoggedIn, isLoggedOut } from '../middlewares/auth.js';
-import { loginAdmin, getAllUsers, logoutAdmin } from '../controllers/admin.js';
+import { loginAdmin, getAllUsers, deleteUserByAdmin, logoutAdmin } from '../controllers/admin.js';
 
 const adminRouter = Router();
 
@@ -17,6 +17,7 @@ adminRouter.use(session({
 
 adminRouter.post('/login', isLoggedOut, loginAdmin);
 adminRouter.get('/dashboard', isLoggedIn(), getAllUsers);
+adminRouter.delete('/dashboard/:id', isLoggedIn(), deleteUserByAdmin);
 adminRouter.get('/logout', isLoggedIn('You\'re already logged out'), logoutAdmin);
 
 export default adminRouter;

@@ -45,4 +45,24 @@ const logoutAdmin = (req, res) => {
     }
 }
 
-export { loginAdmin, getAllUsers, logoutAdmin };
+const deleteUserByAdmin = async (req, res) => {
+    try {
+        const adminId = req.session.userId;
+        const { id } = req.params;
+
+        const admin = await User.findById(adminId);
+        const user = await User.findById(id);
+        if (!user) return errorResponse(res, 401, `No user found with this id ${id}`);
+
+        if (admin.email === user.email) return errorResponse(res, 400, 'Admins can\'t delete themselves from the user\'s dashboard');
+
+        await User.findByIdAndDelete(id);
+
+        successResponse(res, 200, 'User is deleted');
+
+    } catch (error) {
+        return errorResponse(res, 500, error.message);
+    }
+}
+
+export { loginAdmin, getAllUsers, deleteUserByAdmin, logoutAdmin };
