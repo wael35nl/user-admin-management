@@ -1,3 +1,5 @@
+import excelJS from 'excelJS';
+
 import User from "../models/users.js";
 import { comparePassword } from "../helpers/securePassword.js";
 import { errorResponse, successResponse } from "../helpers/responseHandler.js";
@@ -23,10 +25,52 @@ const loginAdmin = async (req, res) => {
     }
 }
 
+const logoutAdmin = (req, res) => {
+    try {
+        req.session.destroy();
+        res.clearCookie('admin-session');
+        successResponse(res, 200, 'Logout successful');
+    } catch (error) {
+        return errorResponse(res, 500, error.message);
+    }
+}
+
 const getAllUsers = async (req, res) => {
     try {
-        const allUsers = await User.find({ is_admin: 0 });
+        const { page = 1, limit = 2 } = req.query;
+        const allUsers = await User.find({ is_admin: 0 }).limit(limit).skip((page - 1) * limit);
         if (!allUsers.length) return errorResponse(res, 404, 'No users found');
+
+        /* load dashboard, pagination and search
+        
+            let search = req.query.search ? req.query.search : '';
+        
+            const usersData = await User.find({
+                is_admin: 0,
+                $or: [
+                    {name: {$regex: '.*' + search + '.*', $options: 'i'}},
+                    {email: {$regex: '.*' + search + '.*', $options: 'i'}},
+                    {phone: {$regex: '.*' + search + '.*', $options: 'i'}},
+                ],
+            }).limit(limit).skip((page - 1) * limit);
+        
+            const count = await User.find({
+                is_admin: 0,
+                $or: [
+                    {name: {$regex: '.*' + search + '.*', $options: 'i'}},
+                    {email: {$regex: '.*' + search + '.*', $options: 'i'}},
+                    {phone: {$regex: '.*' + search + '.*', $options: 'i'}},
+                ],
+            }).countDocuments();
+        
+            res.render('dashboard', {
+                users: usersData,
+                totalPages: Math.ceil(count / limit),
+                currentPage: page,
+                previousPage: page - 1,
+                nextPage: page + 1,
+            });
+        */
 
         successResponse(res, 200, 'All users', { users: allUsers });
 
@@ -35,11 +79,39 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const logoutAdmin = (req, res) => {
+const exportUsersData = async (req, res) => {
     try {
-        req.session.destroy();
-        res.clearCookie('admin-session');
-        successResponse(res, 200, 'Logout successful');
+        const workbook = new excelJS.Workbook();
+        const workSheet = workbook.addWorksheet('Users');
+        workSheet.columns = [
+            { header: 'Name', key: 'name' },
+            { header: 'Email', key: 'email' },
+            { header: 'Password', key: 'password' },
+            { header: 'Phone', key: 'phone' },
+            { header: 'Is Admin', key: 'is_admin' },
+            { header: 'Created At', key: 'createdAt' },
+            { header: 'Image', key: 'image' },
+            { header: 'Is Banned', key: 'isBanned' },
+        ];
+
+        const usersData = await User.find({ is_admin: 0 });
+        usersData.map(user => workSheet.addRow(user));
+
+        workSheet.getRow(1).eachCell(cell => cell.font = { bold: true });
+
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename=' + 'users.xlsx'
+        );
+
+        return workbook.xlsx.write(res).then(() => {
+            res.status(200).end();
+        });
+
     } catch (error) {
         return errorResponse(res, 500, error.message);
     }
@@ -65,4 +137,4 @@ const deleteUserByAdmin = async (req, res) => {
     }
 }
 
-export { loginAdmin, getAllUsers, deleteUserByAdmin, logoutAdmin };
+export { loginAdmin, logoutAdmin, getAllUsers, exportUsersData, deleteUserByAdmin };
