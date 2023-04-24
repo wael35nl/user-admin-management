@@ -12,7 +12,6 @@ const registerUser = async (req, res) => {
         const image = req.file.filename;
         if (!name || !email || !password || !phone) return errorResponse(res, 400, 'Something is messing');
         if (password.length < 6) return errorResponse(res, 400, 'Minimum length for the password is 6 characters');
-        // if (image && image.size > 1000000) return errorResponse(res, 400, 'Maximum size for mage is 1mb');
 
         const isExist = await User.findOne({ email });
         if (isExist) return errorResponse(res, 400, 'This user already exists');
