@@ -9,7 +9,7 @@ import { sendEmailWithNodeMailer } from '../helpers/email.js';
 const registerUser = async (req, res) => {
     try {
         const { name, email, password, phone } = req.body
-        const image = req.file.filename;
+        const image = req.file ? req.file.filename : '';
         if (!name || !email || !password || !phone) return errorResponse(res, 400, 'Something is messing');
         if (password.length < 6) return errorResponse(res, 400, 'Minimum length for the password is 6 characters');
 
@@ -160,8 +160,8 @@ const userProfile = async (req, res) => {
 const updateUser = async (req, res) => {
     try {
         const id = req.session.userId;
-        const { name, phone, password } = req.fields
-        const image = req.file.filename;
+        const { name, phone, password } = req.body
+        const image = req.file ? req.file.filename : '';
         const hashedPassword = await securePassword(password);
 
         const user = await User.findByIdAndUpdate(id, { name, phone, password: hashedPassword }, { new: true });
