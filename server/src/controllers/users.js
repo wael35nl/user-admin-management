@@ -8,7 +8,7 @@ import { sendEmailWithNodeMailer } from '../helpers/email.js';
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, phone } = req.body
+        const { name, email, password, phone } = req.body;
         const image = req.file ? req.file.filename : '';
         if (!name || !email || !password || !phone) return errorResponse(res, 400, 'Something is messing');
         if (password.length < 6) return errorResponse(res, 400, 'Minimum length for the password is 6 characters');
