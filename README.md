@@ -36,13 +36,13 @@ const User = model('users', userSchema);
 
 - packages:
   - express ( Router )
-  - formidable -for files uploads-
+  - formidable/or/multer -for files uploads-
 
 - folder/file:
   - src/routes/users.js
 
 ```js
-router.post('/register', formidable(), registerUser);
+router.post('/register', formidable()/or/multer.uploadSingle('image'), registerUser);
 router.post('/verify-email', verifyEmail);
 ```
 
@@ -175,9 +175,15 @@ jwt.verify(token, jwtSecretKey, async (err, decoded) => {
 
     const newUser = new User({...userData});
 
+    // if image =>
+    // formidable
     if (image) {
         newUser.image.data = fs.readFileSync(image.path);
         newUser.image.contentType = image.type;
+    }
+    // multer
+    if (image) {
+        newUser.image = image.path;
     }
 
     const user = await newUser.save();
@@ -194,7 +200,7 @@ jwt.verify(token, jwtSecretKey, async (err, decoded) => {
 
 #### First step ( User )
 
-1- enter (user name / email) and password, then click on (login / sign in).
+1- enter email and password, then click on (login / sign in).
 
 &nbsp;
 

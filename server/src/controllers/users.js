@@ -167,7 +167,6 @@ const updateUser = async (req, res) => {
         if (!user) return errorResponse(res, 400, 'User wasn\'t updated');
 
         if (image) user.image = `../public/images/${image}`;
-
         if (password) user.password = await securePassword(password);
 
         await user.save();
